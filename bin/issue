@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require_relative "../boot.rb"
+
+Authority.find(ARGV[0]).issue(ARGV[1])
