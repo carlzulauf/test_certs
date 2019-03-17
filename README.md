@@ -23,12 +23,12 @@ bin/issue some-org-name domain.com.test
 Install the built certificate authority in your browser.
 
 ```
-build/some-org-name/ca.crt
+build/some-org-name/ca.bundle
 ```
 
 Install the domain certs in your application's web server.
 
 ```
-build/some-org-name/domain.com.test.crt
+build/some-org-name/domain.com.test.bundle
 build/some-org-name/domain.com.test.key
 ```
