@@ -6,4 +6,5 @@ require 'pstore'
 require 'bundler/setup'
 Bundler.require(:default)
 
+$VERBOSE = nil
 require 'authority'

@@ -1,6 +1,9 @@
 class Authority
-
   attr_reader :name, :dir, :serial_number
+
+  def self.find(ca_org)
+    self.new(ca_org).open
+  end
 
   def initialize(name)
     @name = name
@@ -15,7 +18,6 @@ class Authority
   def update
     build_root
     build_intermediate
-    binding.pry
     self
   end
 
@@ -23,7 +25,6 @@ class Authority
     write_certs(domain, terminal_profile) do |cert|
       cert.subject.common_name = domain
       cert.subject.organization = name
-      cert.serial_number.number = serial_number
       cert.key_material.generate_key
       cert.parent = find_intermediate
     end
@@ -32,14 +33,13 @@ class Authority
   private
 
   def write_certs(cert_name, profile)
+    sn = serial_number
     cert = CertificateAuthority::Certificate.new
+    cert.serial_number.number = sn
     yield cert
-    begin
-      cert.sign! profile
-    rescue
-      binding.pry
-    end
+    cert.sign! profile
     prefix = File.join(dir, cert_name.to_s)
+    puts "Writing cert ##{sn} #{cert.subject.common_name} to #{prefix}"
     File.write("#{prefix}.key", cert.key_material.private_key)
     File.write("#{prefix}.pub", cert.key_material.public_key)
     File.write("#{prefix}.pem", cert.to_pem)
@@ -88,7 +88,6 @@ class Authority
     @root = write_certs(:root, root_profile) do |cert|
       cert.subject.common_name = "#{name}.root"
       cert.subject.organization = name
-      cert.serial_number.number = serial_number
       cert.key_material.generate_key
       cert.signing_entity = true
     end
@@ -98,7 +97,6 @@ class Authority
     @ca = write_certs(:ca, intermediate_profile) do |cert|
       cert.subject.common_name = "ca.#{name}.root"
       cert.subject.organization = name
-      cert.serial_number.number = serial_number
       cert.key_material.generate_key
       cert.signing_entity = true
       cert.parent = @root
@@ -132,9 +130,5 @@ class Authority
         }
       }
     }
-  end
-
-  def self.find(ca_org)
-    self.new(ca_org).open
   end
 end
