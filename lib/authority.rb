@@ -22,7 +22,7 @@ class Authority
   end
 
   def issue(domain)
-    write_certs(domain, terminal_profile) do |cert|
+    write_certs(domain, terminal_profile(domain)) do |cert|
       cert.subject.common_name = domain
       cert.subject.organization = name
       cert.key_material.generate_key
@@ -114,15 +114,14 @@ class Authority
     root_profile
   end
 
-  def terminal_profile
+  def terminal_profile(domain)
     {
       "extensions" => {
         "keyUsage" => {
           "usage" => ["critical", "digitalSignature", "keyEncipherment"]
         },
-        "extendedKeyUsage" => {
-          "usage" => ["serverAuth", "clientAuth"]
-        }
+        "extendedKeyUsage" => { "usage" => ["serverAuth", "clientAuth"] },
+        "subjectAltName" => { "dns_names" => [ domain ] }
       }
     }
   end
