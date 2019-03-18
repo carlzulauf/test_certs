@@ -42,8 +42,7 @@ class Authority
     puts "Writing cert ##{sn} #{cert.subject.common_name} to #{prefix}"
     File.write("#{prefix}.key", cert.key_material.private_key)
     File.write("#{prefix}.pub", cert.key_material.public_key)
-    File.write("#{prefix}.pem", cert.to_pem)
-    File.write("#{prefix}.bundle", to_bundle(cert))
+    File.write("#{prefix}.pem", to_bundle(cert))
     cert
   end
 
@@ -69,10 +68,6 @@ class Authority
       )
     end
   end
-
-  # def find_root
-  #   find_cert(:root) || build_root
-  # end
 
   def find_intermediate
     if cert = find_cert(:ca)
